@@ -104,8 +104,23 @@ public class PluginConfiguration : BasePluginConfiguration
     /// <summary>Gets or sets ratings that Jellyfin scores but that mean nothing modern, comma-separated.</summary>
     public string UnverifiedRatings { get; set; } = "Approved, Passed";
 
-    /// <summary>Gets or sets keyword fragments that suggest mature content on the review list, comma-separated.</summary>
-    public string MatureKeywords { get; set; } = "nudity, sex scene, erotic, gore, splatter, slasher, torture, rape, incest, prostitut, stripper, porn, drug addiction, drug abuse, heroin, serial killer, cannibal, graphic violence";
+    /// <summary>
+    /// The 1.3 default for <see cref="MatureKeywords"/>, matched as fragments inside tags. Configs still holding it
+    /// are moved to the current defaults, since several fragments (<c>prostitut</c>) match nothing as whole words.
+    /// </summary>
+    public const string MatureKeywords13 = "nudity, sex scene, erotic, gore, splatter, slasher, torture, rape, incest, prostitut, stripper, porn, drug addiction, drug abuse, heroin, serial killer, cannibal, graphic violence";
+
+    /// <summary>
+    /// Gets or sets keywords that suggest explicit sexual content on the review list, comma-separated. Keywords
+    /// match whole words (plus plural/verb endings); end one with <c>*</c> to match any word starting with it.
+    /// </summary>
+    public string ExplicitKeywords { get; set; } = "softcore, sexploitation, erotic movie, erotica, porn*, orgy, orgies, burlesque, striptease, stripper, semen";
+
+    /// <summary>Gets or sets the rating explicit keywords in a tag or title suggest.</summary>
+    public string ExplicitRating { get; set; } = "NC-17";
+
+    /// <summary>Gets or sets keywords that suggest mature content on the review list, comma-separated (matched like <see cref="ExplicitKeywords"/>).</summary>
+    public string MatureKeywords { get; set; } = "nudity, nude, naked, sex, sexual*, sexy, erotic*, gore, splatter, slasher, torture, rape, incest, prostitut*, drug addiction, drug abuse*, heroin, serial killer, cannibal*, graphic violence";
 
     /// <summary>Gets or sets the rating mature keywords suggest.</summary>
     public string MatureRating { get; set; } = "R";
@@ -126,6 +141,25 @@ public class PluginConfiguration : BasePluginConfiguration
     /// <summary>Gets or sets tag → rating era hints for the review list, one <c>tag=Rating</c> per line.</summary>
     public string EraTags { get; set; } = "pre-code=PG-13";
 
+    /// <summary>Gets or sets the Production Code era as <c>from-to</c> years; blank turns the hint off.</summary>
+    public string CodeEraYears { get; set; } = "1934-1967";
+
+    /// <summary>Gets or sets the rating suggested for US films of the Code era that nothing else rates.</summary>
+    public string CodeEraRating { get; set; } = "G";
+
     /// <summary>Gets or sets how long source lookups are cached, in days.</summary>
     public int CacheDays { get; set; } = 30;
+
+    /// <summary>Moves suggestion settings still on an old default to the current one.</summary>
+    /// <returns>Whether anything changed.</returns>
+    public bool MigrateSuggestionDefaults()
+    {
+        if (MatureKeywords != MatureKeywords13)
+        {
+            return false;
+        }
+
+        MatureKeywords = new PluginConfiguration().MatureKeywords;
+        return true;
+    }
 }

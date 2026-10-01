@@ -104,7 +104,7 @@ Settings worth knowing:
 | Libraries | all | Tick the ones to re-rate |
 | Rating system | US ladders | Presets for GB, CA, IE, DE, AU, NZ — match your libraries' Metadata country |
 | OMDb | On when a key is set | Only asked about titles nothing else rates |
-| Review suggestions | Keywords → R; Horror → R; Thriller/Crime/War/Documentary → PG-13; Animation/Family → PG; `pre-code` → PG-13 | Strictest signal wins; editable |
+| Review suggestions | Explicit keywords in tags/title → NC-17; mature keywords → R; Horror → R; Thriller/Crime/War/Documentary → PG-13; Animation/Family → PG; `pre-code` → PG-13; US films of 1934–1967 with nothing else → G | Strictest signal wins; keywords match whole words (`*` for prefixes); editable |
 | Suggest from collections | Off | When on, only collections of up to 4 titles count — small collections share many traits, big ones usually one |
 
 ## Good to know

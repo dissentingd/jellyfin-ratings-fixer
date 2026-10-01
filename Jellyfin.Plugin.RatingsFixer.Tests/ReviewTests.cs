@@ -22,6 +22,94 @@ public class ReviewSuggesterTests
         Assert.Contains("prostitution", s.Reasons[0]);
     }
 
+    [Theory]
+    [InlineData("rape", "rape and revenge", true)]
+    [InlineData("rape", "she was raped", true)]
+    [InlineData("rape", "grapes of wrath", false)]
+    [InlineData("heroin", "heroin", true)]
+    [InlineData("heroin", "strong female heroine", false)] // found live: 24 "heroine" titles were suggested R
+    [InlineData("sex", "sex comedy", true)]
+    [InlineData("sex", "sexism", false)]
+    [InlineData("stripper", "two strippers", true)]
+    [InlineData("prostitut*", "prostitution", true)]
+    [InlineData("porn*", "pornography", true)]
+    [InlineData("porn*", "a sporn", false)]
+    [InlineData("serial killer", "Serial Killers", true)]
+    public void Keywords_MatchWholeWords_OrPrefixesWithAStar(string keyword, string text, bool expected)
+    {
+        Assert.Equal(expected, new KeywordMatcher([keyword]).Find([text]).Count == 1);
+    }
+
+    [Fact]
+    public void ExplicitKeywords_InTagsOrTitle_SuggestNc17()
+    {
+        var byTag = Suggester().Suggest(new ReviewFacts { Genres = ["Comedy"], Tags = ["softcore", "sex"] })!;
+        Assert.Equal("NC-17", byTag.Rating);
+        Assert.Contains("softcore", byTag.Reasons[0]);
+        Assert.Equal("NC-17", Suggester().Suggest(new ReviewFacts { Name = "Burlesque Nights" })!.Rating);
+    }
+
+    [Fact]
+    public void ExplicitKeywords_OnlyInTheSummary_SuggestR()
+    {
+        // A summary mentioning a stripper is usually a drama about one, not a sex film.
+        var s = Suggester().Suggest(new ReviewFacts { Genres = ["Drama"], Overview = "A stripper tries to start over." })!;
+        Assert.Equal("R", s.Rating);
+        Assert.Contains("stripper (in summary)", s.Reasons[0]);
+    }
+
+    [Fact]
+    public void MatureKeywords_CountInTheSummaryAndTitle()
+    {
+        Assert.Equal("R", Suggester().Suggest(new ReviewFacts { Overview = "A sexy comedy about two roommates." })!.Rating);
+        Assert.Equal("R", Suggester().Suggest(new ReviewFacts { Name = "Naked Lunch" })!.Rating);
+        Assert.Null(Suggester().Suggest(new ReviewFacts { Overview = "Our heroine fights sexism at work." }));
+    }
+
+    [Fact]
+    public void CodeEra_UsFilmWithNoOtherSignal_SuggestsG()
+    {
+        var s = Suggester().Suggest(new ReviewFacts { Year = 1944, ProductionLocations = ["United States of America"] })!;
+        Assert.Equal("G", s.Rating);
+        Assert.Contains("Production Code", s.Reasons[0]);
+    }
+
+    [Theory]
+    [InlineData(1964, "Japan")] // the Code was American: Zatoichi isn't a G
+    [InlineData(1972, "United States of America")]
+    [InlineData(1930, "United States of America")]
+    public void CodeEra_OnlyUsFilmsOfThoseYears(int year, string country)
+    {
+        Assert.Null(Suggester().Suggest(new ReviewFacts { Year = year, ProductionLocations = [country] }));
+    }
+
+    [Fact]
+    public void CodeEra_NeedsKnownUsOnlyProduction_AndYieldsToOtherSignals()
+    {
+        Assert.Null(Suggester().Suggest(new ReviewFacts { Year = 1950 }));
+        Assert.Null(Suggester().Suggest(new ReviewFacts { Year = 1950, ProductionLocations = ["United States of America", "Italy"] }));
+        Assert.Equal("PG-13", Suggester().Suggest(new ReviewFacts { Year = 1950, ProductionLocations = ["United States of America"], Genres = ["Crime"] })!.Rating);
+    }
+
+    [Fact]
+    public void CodeEra_BlankTurnsItOff()
+    {
+        var config = new PluginConfiguration { CodeEraYears = string.Empty };
+        Assert.Null(Suggester(config).Suggest(new ReviewFacts { Year = 1944, ProductionLocations = ["United States of America"] }));
+    }
+
+    [Fact]
+    public void OldDefaultKeywords_AreMigrated_CustomOnesKept()
+    {
+        var old = new PluginConfiguration { MatureKeywords = PluginConfiguration.MatureKeywords13 };
+        Assert.True(old.MigrateSuggestionDefaults());
+        Assert.Equal(new PluginConfiguration().MatureKeywords, old.MatureKeywords);
+
+        var custom = new PluginConfiguration { MatureKeywords = "gore" };
+        Assert.False(custom.MigrateSuggestionDefaults());
+        Assert.Equal("gore", custom.MatureKeywords);
+    }
+
     [Fact]
     public void Genres_UseTheStrictestMatch()
     {

@@ -140,9 +140,17 @@ kept and the rest is picked up on a later run.
 ## Review panel and suggestions
 
 For review-list titles, `ReviewSuggester` (pure, unit-tested) collects signals, each proposing a rating
-with a reason; the strictest wins (erring safe) and is mapped onto the item's ladder:
+with a reason; the strictest wins (erring safe). A rating already on the item's ladder is kept as is
+(mapping by score would fold NC-17 into R, which share a score); anything else is mapped onto the ladder:
 
-- **Content keywords** in the title's tags (TMDb keywords, for most libraries) → `R` by default.
+- **Explicit keywords** (softcore, sexploitation, erotic movie, porn\*, orgy, burlesque, stripper, …) in
+  the title's tags or its title → `NC-17`. Found only in the plot summary they suggest `R` instead: on a
+  real review list, summary-only hits were mostly dramas about strippers, documentaries about pornography,
+  and 1930s–50s musicals with a burlesque number.
+- **Mature keywords** (sex, sexual\*, nudity, rape, gore, prostitut\*, …) in tags, title or summary → `R`.
+- Keywords match **whole words** plus plural/verb endings (`rape` finds "raped", not "grapes"); a keyword
+  ending in `*` matches any word starting with it. 1.3 matched fragments inside tags, so `heroin` hit every
+  "heroine" tag and `sex` would hit "sexism". Configs still on the 1.3 default list are migrated on load.
 - **Genre map** (default Horror → R; Thriller/Crime/War/Documentary → PG-13; Animation/Family → PG).
 - **Collection siblings** (off by default): the strictest rating among the other titles of each
   collection it's in, only for collections of at most 4 titles. Small collections share many traits
@@ -150,6 +158,14 @@ with a reason; the strictest wins (erring safe) and is mapped onto the item's la
   library with many kinds of collections, even a limit of 30 made suggestions misleading, and lists running
   to hundreds of titles made every member look as strict as its strictest entry.
 - **Tag hints** (default `pre-code` → PG-13).
+- **Production Code era** (default 1934–1967 → G), only when **no other signal applies** and every
+  production country is the US: Code-era studio films are mostly family viewing, but the Code was
+  American — a 1964 Japanese samurai film is not a G.
+
+Tuned against an admin's hand decisions on a real review list: 40 of 44 matched with summary-level NC-17,
+39 of 44 with the summary downgrade, which was kept because it removed 26 mostly-wrong NC-17 suggestions
+(the one lost is a sex comedy whose only signal was "burlesque" in its summary). The rest had no usable
+signal in their metadata at all.
 
 Suggestions are **never written automatically** — a wrong guess could expose content to children. The
 panel writes only what the admin sets or accepts, through the normal write path, recorded in the ledger

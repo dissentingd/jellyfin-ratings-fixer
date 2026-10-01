@@ -19,6 +19,10 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         : base(applicationPaths, xmlSerializer)
     {
         Instance = this;
+        if (Configuration.MigrateSuggestionDefaults())
+        {
+            SaveConfiguration();
+        }
     }
 
     /// <summary>Gets the running instance.</summary>

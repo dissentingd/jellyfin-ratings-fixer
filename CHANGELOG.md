@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.0 (unreleased)
+
+- **Better review suggestions**, tuned against hand-made decisions on a real review list (34 → 39 of 44 agree):
+  - **Explicit keywords → NC-17** (softcore, sexploitation, erotic movie, porn\*, orgy, burlesque, stripper,
+    …) when they're in a title's tags or its title. Only in the plot summary, they suggest R — a summary
+    mentioning a stripper is usually a drama about one.
+  - Keywords are also looked for in the **title and plot summary**, not just tags.
+  - Keywords now match **whole words**, plurals and verb endings included; end one with `*` to match word
+    starts (`prostitut*`). Before, they matched fragments, so `heroin` flagged every title tagged "heroine".
+    If you never changed the keyword list, it's updated to the new default automatically.
+  - **Production Code era hint:** US films from 1934–1967 with no other signal are suggested G. Films made
+    anywhere else are left alone. Years and rating are editable; blank turns it off.
+  - Reasons show the word that matched (e.g. "prostitution", not `prostitut*`).
+
 ## 1.3.0
 
 - **Review panel.** Titles no source could rate are listed with their poster, plot summary, genres and a

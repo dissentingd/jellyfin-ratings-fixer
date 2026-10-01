@@ -169,8 +169,15 @@
                     <h3 class="sectionTitle">Review suggestions</h3>
                     <p class="cs-muted">For titles no source rates, the Review panel suggests a rating from other metadata. Suggestions are never written unless you accept them; when several signals apply, the strictest wins.</p>
                     <div class="inputContainer">
+                        <input is="emby-input" type="text" id="ExplicitKeywords" label="Keywords that suggest explicit sexual content" />
+                        <div class="fieldDescription">Comma-separated. A keyword matches whole words, plurals included (<code>stripper</code> finds strippers); end it with <code>*</code> to match any word starting with it (<code>porn*</code> finds pornography). Found in a tag or the title, they suggest the rating below; found only in the summary, the mature rating.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <input is="emby-input" type="text" id="ExplicitRating" label="Rating explicit keywords suggest" />
+                    </div>
+                    <div class="inputContainer">
                         <input is="emby-input" type="text" id="MatureKeywords" label="Keywords that suggest mature content" />
-                        <div class="fieldDescription">Comma-separated fragments, matched inside a title's tags (e.g. <code>prostitut</code> matches prostitute and prostitution).</div>
+                        <div class="fieldDescription">Matched the same way, in tags, title and summary (e.g. <code>prostitut*</code> finds prostitute and prostitution; <code>sex</code> finds "sex comedy" but not "sexism").</div>
                     </div>
                     <div class="inputContainer">
                         <input is="emby-input" type="text" id="MatureRating" label="Rating those keywords suggest" />
@@ -180,6 +187,13 @@
                     </div>
                     <div class="inputContainer">
                         <textarea is="emby-textarea" id="EraTags" rows="2" label="Tag hints (tag=Rating, one per line)"></textarea>
+                    </div>
+                    <div class="inputContainer">
+                        <input is="emby-input" type="text" id="CodeEraYears" label="Production Code era (years, from-to)" />
+                        <div class="fieldDescription">US films from these years had to pass the Production Code, so when nothing else applies they're suggested the rating below. Only titles whose production countries are all US count. Blank = off.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <input is="emby-input" type="text" id="CodeEraRating" label="Rating for Code-era films" />
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label><input is="emby-checkbox" type="checkbox" id="SuggestFromCollections" /><span>Suggest from other titles in the same collection (off by default)</span></label>
@@ -286,7 +300,7 @@
         (function () {
             var pluginId = '65127be7-01ef-469f-b13b-ecfa1289f5ed';
             var page = document.querySelector('#ratingsFixerConfigPage');
-            var textFields = ['Combine', 'TmdbApiKey', 'Countries', 'FallbackCountries', 'MdblistApiKey', 'TvdbApiKey', 'TvdbPin', 'OmdbApiKey', 'MovieLadder', 'SeriesLadder', 'LegacyMap', 'UnverifiedRatings', 'MatureKeywords', 'MatureRating', 'GenreRatings', 'EraTags'];
+            var textFields = ['Combine', 'TmdbApiKey', 'Countries', 'FallbackCountries', 'MdblistApiKey', 'TvdbApiKey', 'TvdbPin', 'OmdbApiKey', 'MovieLadder', 'SeriesLadder', 'LegacyMap', 'UnverifiedRatings', 'ExplicitKeywords', 'ExplicitRating', 'MatureKeywords', 'MatureRating', 'GenreRatings', 'EraTags', 'CodeEraYears', 'CodeEraRating'];
             var boolFields = ['UseTmdb', 'UseCommonSense', 'UseTvdb', 'UseOmdb', 'RoundToNearest', 'RaiseOnly', 'RespectManualCustomRating', 'RespectLockedRating', 'AutoRateNewItems', 'SuggestFromCollections'];
             var report = null;
 

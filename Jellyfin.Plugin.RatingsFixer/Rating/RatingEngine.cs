@@ -232,6 +232,13 @@ public sealed class RatingEngine
     /// on a sub-scored step when a plain step shares its score — so a foreign 18 becomes <c>R</c>, not
     /// <c>NC-17</c> (while a series still reaches <c>TV-MA</c>, the only 17 on its ladder).
     /// </summary>
+    /// <summary>Gets the ladder's own spelling of a rating, or null when the rating isn't on the title's ladder.</summary>
+    /// <param name="rating">The rating.</param>
+    /// <param name="isSeries">Whether the title is a series.</param>
+    /// <returns>The ladder entry, or null.</returns>
+    public string? OnLadder(string rating, bool isSeries) =>
+        (isSeries ? _seriesLadder : _movieLadder).FirstOrDefault(s => string.Equals(s.Rating, rating.Trim(), StringComparison.OrdinalIgnoreCase)).Rating;
+
     /// <summary>Puts a score onto the movie or series ladder, the same way source ratings are mapped.</summary>
     /// <param name="score">The score.</param>
     /// <param name="isSeries">Whether to use the series ladder.</param>

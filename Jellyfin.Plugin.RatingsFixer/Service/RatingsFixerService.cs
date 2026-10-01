@@ -366,7 +366,10 @@ public sealed class RatingsFixerService(
             var facts = new ReviewFacts
             {
                 IsSeries = item is Series,
+                Name = item.Name,
+                Overview = item.Overview,
                 Year = item.ProductionYear,
+                ProductionLocations = item.ProductionLocations ?? [],
                 Genres = item.Genres,
                 Tags = item.Tags,
                 SiblingRatings = siblings.GetValueOrDefault(item.Id, []),
@@ -473,12 +476,24 @@ public sealed class RatingsFixerService(
     /// <returns>The options.</returns>
     public static SuggesterOptions ToSuggesterOptions(PluginConfiguration config) => new()
     {
+        ExplicitKeywords = SplitList(config.ExplicitKeywords),
+        ExplicitRating = string.IsNullOrWhiteSpace(config.ExplicitRating) ? "NC-17" : config.ExplicitRating.Trim(),
         MatureKeywords = SplitList(config.MatureKeywords),
         MatureRating = string.IsNullOrWhiteSpace(config.MatureRating) ? "R" : config.MatureRating.Trim(),
         GenreRatings = ParseMap(config.GenreRatings),
         UseCollections = config.SuggestFromCollections,
         EraTags = ParseMap(config.EraTags),
+        CodeEraYears = ParseYears(config.CodeEraYears),
+        CodeEraRating = string.IsNullOrWhiteSpace(config.CodeEraRating) ? "G" : config.CodeEraRating.Trim(),
     };
+
+    private static (int From, int To)? ParseYears(string? text)
+    {
+        var parts = (text ?? string.Empty).Split('-', StringSplitOptions.TrimEntries);
+        return parts.Length == 2 && int.TryParse(parts[0], out var from) && int.TryParse(parts[1], out var to) && from <= to
+            ? (from, to)
+            : null;
+    }
 
     /// <summary>Gets the titles excluded from re-rating.</summary>
     /// <returns>The entries.</returns>
