@@ -13,6 +13,10 @@
   - **Production Code era hint:** US films from 1934–1967 with no other signal are suggested G. Films made
     anywhere else are left alone. Years and rating are editable; blank turns it off.
   - Reasons show the word that matched (e.g. "prostitution", not `prostitut*`).
+- **Faster Review panel:** setting or accepting a rating no longer reloads the whole review list (seconds on
+  a big library) - written titles just drop out, and you stay where you were. The list itself loads with one
+  library query instead of one per title.
+- Run log lines include how long the run took.
 
 ## 1.3.0
 

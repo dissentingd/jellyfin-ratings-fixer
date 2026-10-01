@@ -221,6 +221,7 @@ public class ReviewPanelTests : ServiceTestBase
         var result = await Service.AssignAsync([new ReviewAssignment { ItemId = movie.Id, Rating = "R", AcceptedSuggestion = true }], CancellationToken.None);
 
         Assert.Equal(1, result.Written);
+        Assert.Equal([movie.Id], result.WrittenIds); // the panel drops these without reloading the list
         Assert.Equal(("R", 17), (movie.CustomRating, movie.InheritedParentalRatingValue));
         var entry = Assert.Single(RatingLedger.Load(Service.LedgerPath).Entries);
         Assert.Contains("accepted suggestion", entry.Reason);

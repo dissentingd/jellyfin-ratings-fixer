@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Jellyfin.Data.Enums;
 using Jellyfin.Plugin.RatingsFixer.Configuration;
@@ -354,11 +355,18 @@ public sealed class RatingsFixerService(
         var engine = new RatingEngine(scale, ToEngineOptions(config));
         var suggester = new ReviewSuggester(scale, engine, ToSuggesterOptions(config));
         var ids = report.Entries.Where(e => e.Kind == DecisionKind.Review).Select(e => e.ItemId).ToHashSet();
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        // One library query for the whole list: fetching thousands of items one by one made the panel slow.
+        var items = LoadItems(ids, allLibraries: true).ToDictionary(i => i.Id);
         var siblings = config.SuggestFromCollections ? CollectionSiblings(ids, config.SuggestionCollectionMaxSize) : [];
-        var result = new List<ReviewItem>();
+        var result = new List<ReviewItem>(items.Count);
         foreach (var entry in report.Entries.Where(e => e.Kind == DecisionKind.Review))
         {
-            if (libraryManager.GetItemById(entry.ItemId) is not { } item)
+            if (!items.TryGetValue(entry.ItemId, out var item))
             {
                 continue;
             }
@@ -439,6 +447,7 @@ public sealed class RatingsFixerService(
 
                     written[item.Id] = reason;
                     result.Written++;
+                    result.WrittenIds.Add(item.Id);
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
                 {
@@ -633,9 +642,10 @@ public sealed class RatingsFixerService(
         }
 
         logger.LogInformation(
-            "Ratings Fixer {Mode}: {Scanned} items — {Counts}",
+            "Ratings Fixer {Mode}: {Scanned} items in {Elapsed} — {Counts}",
             apply ? "apply" : "preview",
             report.ItemsScanned,
+            (report.Finished - report.Started).ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture),
             string.Join(", ", counts.Select(c => $"{c.Key} {c.Value}")));
         foreach (var warning in report.Warnings)
         {

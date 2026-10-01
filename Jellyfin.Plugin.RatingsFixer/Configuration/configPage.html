@@ -686,24 +686,31 @@
                 ApiClient.ajax({ type: 'GET', url: ApiClient.getUrl('RatingsFixer/Review'), dataType: 'json' }).then(function (items) {
                     reviewItems = items || [];
                     reviewSelected = {};
-                    var genres = {};
-                    var decades = {};
-                    reviewItems.forEach(function (i) {
-                        (prop(i, 'Genres') || []).forEach(function (g) { genres[g] = (genres[g] || 0) + 1; });
-                        var y = prop(i, 'Year');
-                        decades[y ? Math.floor(y / 10) * 10 : 0] = true;
-                    });
-                    $('#cs-rv-genre').innerHTML = '<option value="">All</option>' + Object.keys(genres).sort().map(function (g) {
-                        return '<option value="' + esc(g) + '">' + esc(g) + ' (' + genres[g] + ')</option>';
-                    }).join('');
-                    $('#cs-rv-decade').innerHTML = '<option value="">All</option>' + Object.keys(decades).sort().map(function (d) {
-                        return '<option value="' + d + '">' + (d === '0' ? 'Unknown' : d + 's') + '</option>';
-                    }).join('');
+                    reviewFilterOptions();
                     $('#cs-rv-bulk-rating').innerHTML = ladderOptions(false, 'R');
                     renderReview();
                 }, function () {
                     $('#cs-review').innerHTML = '<p class="cs-muted">No report yet — run a preview.</p>';
                 });
+            }
+
+            // Genre and decade choices with counts, keeping whatever is currently picked.
+            function reviewFilterOptions() {
+                var genres = {};
+                var decades = {};
+                reviewItems.forEach(function (i) {
+                    (prop(i, 'Genres') || []).forEach(function (g) { genres[g] = (genres[g] || 0) + 1; });
+                    var y = prop(i, 'Year');
+                    decades[y ? Math.floor(y / 10) * 10 : 0] = true;
+                });
+                var genre = $('#cs-rv-genre').value;
+                var decade = $('#cs-rv-decade').value;
+                $('#cs-rv-genre').innerHTML = '<option value="">All</option>' + Object.keys(genres).sort().map(function (g) {
+                    return '<option value="' + esc(g) + '"' + (g === genre ? ' selected' : '') + '>' + esc(g) + ' (' + genres[g] + ')</option>';
+                }).join('');
+                $('#cs-rv-decade').innerHTML = '<option value="">All</option>' + Object.keys(decades).sort().map(function (d) {
+                    return '<option value="' + d + '"' + (d === decade ? ' selected' : '') + '>' + (d === '0' ? 'Unknown' : d + 's') + '</option>';
+                }).join('');
             }
 
             function reviewMatches() {
@@ -802,8 +809,14 @@
                     $('#cs-review-result').innerHTML = '<p>Wrote ' + esc(prop(r, 'Written')) + ' rating(s)' +
                         (prop(r, 'ChildrenUpdated') ? ' and gave ' + esc(prop(r, 'ChildrenUpdated')) + ' season(s)/episode(s) their series&#39; rating' : '') + '.</p>' +
                         errors.map(function (e) { return '<p class="cs-err">' + esc(e) + '</p>'; }).join('');
-                    keepReviewScroll = true; // stay where you were in the list after a write
-                    loadReview();
+                    // Drop what was written from the list we already have: re-fetching the whole review list
+                    // after every write took seconds on a big library. Stay where you were in the list.
+                    var written = {};
+                    (prop(r, 'WrittenIds') || []).forEach(function (id) { written[id] = true; delete reviewSelected[id]; });
+                    reviewItems = reviewItems.filter(function (i) { return !written[prop(i, 'ItemId')]; });
+                    reviewFilterOptions();
+                    keepReviewScroll = true;
+                    renderReview();
                     loadLedger();
                     loadReport();
                 });

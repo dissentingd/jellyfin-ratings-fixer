@@ -129,6 +129,9 @@ public sealed class AssignReport
     /// <summary>Gets or sets titles written.</summary>
     public int Written { get; set; }
 
+    /// <summary>Gets or sets the ids of the titles written, so the panel can drop them without reloading the list.</summary>
+    public List<Guid> WrittenIds { get; set; } = [];
+
     /// <summary>Gets or sets seasons and episodes given their series' new rating.</summary>
     public int ChildrenUpdated { get; set; }
 
