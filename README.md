@@ -6,7 +6,7 @@ A Jellyfin plugin that re-rates your library to **modern parental-rating standar
 built-in parental controls actually work on older and unrated titles — and keeps those corrections safe
 from metadata refreshes.
 
-**Version 1.3** · Jellyfin **12.1+** · [Changelog](CHANGELOG.md) · [Design notes](docs/DESIGN.md)
+**Version 1.3** · Jellyfin **12.4+** · [Changelog](CHANGELOG.md) · [Design notes](docs/DESIGN.md)
 
 > [!WARNING]
 > **Back up Jellyfin's database before your first Apply** (Dashboard → Backups, or copy `jellyfin.db`

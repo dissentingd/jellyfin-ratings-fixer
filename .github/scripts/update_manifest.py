@@ -10,7 +10,7 @@ plugin = manifest[0]
 entry = {
     "version": version,
     "changelog": open(notes_file, encoding="utf-8").read().strip(),
-    "targetAbi": "12.1.0.0",
+    "targetAbi": "12.4.0.0",
     "sourceUrl": url,
     "checksum": checksum,
     "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
