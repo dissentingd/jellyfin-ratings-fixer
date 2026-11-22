@@ -2,6 +2,7 @@
 
 ## 1.4.0 (unreleased)
 
+- **Requires Jellyfin 12.4** (built against 12.4.0). Servers on 12.1–12.3 can stay on 1.3.0.
 - **Better review suggestions**, tuned against hand-made decisions on a real review list (34 → 39 of 44 agree):
   - **Explicit keywords → NC-17** (softcore, sexploitation, erotic movie, porn\*, orgy, burlesque, stripper,
     …) when they're in a title's tags or its title. Only in the plot summary, they suggest R — a summary
