@@ -6,7 +6,7 @@ A Jellyfin plugin that re-rates your library to **modern parental-rating standar
 built-in parental controls actually work on older and unrated titles — and keeps those corrections safe
 from metadata refreshes.
 
-**Version 1.3** · Jellyfin **12.4+** · [Changelog](CHANGELOG.md) · [Design notes](docs/DESIGN.md)
+**Version 1.4** · Jellyfin **12.4+** · [Changelog](CHANGELOG.md) · [Design notes](docs/DESIGN.md)
 
 > [!WARNING]
 > **Back up Jellyfin's database before your first Apply** (Dashboard → Backups, or copy `jellyfin.db`
@@ -133,7 +133,7 @@ against an in-memory fake of Jellyfin's library (`ServiceTestKit.cs`): what gets
 series → episode cascades, the ledger, revert, restore, review writes and auto-rate triggers. A test also
 parses the settings page's script, since a syntax error there silently breaks the whole page.
 
-To release: bump `<AssemblyVersion>`, add a `CHANGELOG.md` section, and push a tag like `v1.3.0`. The
+To release: bump `<AssemblyVersion>`, add a `CHANGELOG.md` section, and push a tag like `v1.4.0`. The
 release workflow builds, tests, publishes the zip, and adds the version to `manifest.json`.
 
 ## Attribution

@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0 (unreleased)
+## 1.4.0
 
 - **Requires Jellyfin 12.4** (built against 12.4.0). Servers on 12.1–12.3 can stay on 1.3.0.
 - **Better review suggestions**, tuned against hand-made decisions on a real review list (34 → 39 of 44 agree):
